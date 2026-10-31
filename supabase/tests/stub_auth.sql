@@ -14,7 +14,7 @@ end
 $$;
 
 create schema if not exists auth;
-create table if not exists auth.users (id uuid primary key, email text);
+create table if not exists auth.users (id uuid primary key, email text, phone text);
 
 -- Comme Supabase : l'utilisateur vient du JWT (ici, d'un paramètre de session).
 create or replace function auth.uid() returns uuid
@@ -28,3 +28,8 @@ grant execute on function auth.uid() to anon, authenticated;
 -- Supabase accorde par défaut tous les droits sur public à anon/authenticated ;
 -- on reproduit ce comportement pour vérifier que la migration les retire bien.
 alter default privileges in schema public grant all on tables to anon, authenticated;
+alter default privileges in schema public grant execute on functions to anon, authenticated;
+
+-- Comme Supabase : schéma des extensions accessible aux rôles de l'API.
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated;

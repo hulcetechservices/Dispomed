@@ -25,4 +25,4 @@ PSQL=(psql -h /tmp -p "$PORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q)
 for m in "$RACINE"/supabase/migrations/*.sql; do
   "${PSQL[@]}" -f "$m"
 done
-"${PSQL[@]}" -f "$ICI/isolation.sql"
+"${PSQL[@]}" -f "$ICI/acces.sql"
