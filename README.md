@@ -62,11 +62,19 @@ ou collez `supabase/migrations/20261031000001_semaine1_officines_stock.sql` dans
 `app/config.js` pointe vers le projet Supabase « dispomed » (région Paris), avec la clé
 publique anon. Jamais la clé `service_role`.
 
-Déploiement : projet Vercel « dispomed », dossier racine `app`, sans commande de build.
-`app/vercel.json` ajoute les en-têtes de sécurité (scripts limités au site, au CDN et à Supabase).
+**En ligne : https://dispomed-tan.vercel.app** (projet Vercel « dispomed »).
 
-Dans Supabase > Authentication > URL Configuration, ajoutez l'adresse du site
-(pour le lien « mot de passe oublié »).
+Déploiement : le contenu du dossier `app` est publié tel quel, sans commande de build.
+`app/vercel.json` ajoute les en-têtes de sécurité (scripts limités au site, au CDN et à Supabase).
+La protection Vercel reste active sur les prévisualisations ; l'adresse de production est publique,
+l'accès aux données étant protégé par la connexion et les règles de la base.
+
+Pour que chaque `git push` redéploie automatiquement, installez l'application GitHub de Vercel
+sur le dépôt (Vercel > projet dispomed > Settings > Git), avec `app` comme dossier racine.
+
+Dans Supabase > Authentication > URL Configuration, mettez `https://dispomed-tan.vercel.app`
+en *Site URL* et dans les *Redirect URLs* : les liens d'invitation et de réinitialisation
+y renvoient.
 
 Pour tester en local :
 
@@ -77,7 +85,8 @@ cd app && npx serve .
 ### 3. Créer un compte pharmacien (équipe Dispomed)
 
 1. Vérifiez le numéro d'inscription à l'Ordre.
-2. Supabase > Authentication > Users > *Add user* : e-mail et mot de passe provisoire.
+2. Supabase > Authentication > Users > *Invite user* : saisissez l'e-mail du pharmacien.
+   Il reçoit un lien, arrive sur l'écran « Bienvenue » et choisit lui-même son mot de passe.
 3. Dans l'éditeur SQL :
 
 ```sql
@@ -92,8 +101,7 @@ select id, 'ID_OFFICINE', 'Dr …', 'N° ORDRE', true
 from auth.users where email = 'pharmacien@exemple.ga';
 ```
 
-Le pharmacien se connecte, change son mot de passe via « mot de passe oublié »,
-puis importe son stock.
+Le pharmacien ouvre le lien d'invitation, choisit son mot de passe, puis importe son stock.
 
 ## Import du stock
 
