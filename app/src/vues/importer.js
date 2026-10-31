@@ -83,7 +83,7 @@ async function lireTableau(fichier) {
   }
   let texte = await fichier.text();
   // Exports Windows en Latin-1 : caractères illisibles → on relit en windows-1252.
-  if (texte.includes('�')) {
+  if (texte.includes('\uFFFD')) {
     texte = new TextDecoder('windows-1252').decode(await fichier.arrayBuffer());
   }
   return analyserCsv(texte);
