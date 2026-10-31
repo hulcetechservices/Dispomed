@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "e2e": "node build.mjs --faux && node tests/e2e/back-office.mjs"
+    "e2e": "node build.mjs --faux && node tests/e2e/back-office.mjs && node build.mjs --faux --min && node tests/e2e/patient.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

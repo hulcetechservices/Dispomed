@@ -1,0 +1,16 @@
+{
+  "name": "Pharmacies Gabon",
+  "short_name": "Pharmacies",
+  "description": "Pharmacies de garde, ouvertes et acceptant la CNAMGS dans le Grand Libreville.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f7f5",
+  "theme_color": "#0b4f4a",
+  "icons": [
+    { "src": "/icones/icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icones/icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icones/icone-masquable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

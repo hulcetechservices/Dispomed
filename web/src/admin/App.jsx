@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase, messageErreur } from '../lib/supabase.js';
-import { Croix } from '../Accueil.jsx';
+import { Croix } from '../Croix.jsx';
 import { FournisseurNotif } from './ui.jsx';
 import Connexion from './Connexion.jsx';
 import Pharmacies from './Pharmacies.jsx';

@@ -58,8 +58,8 @@ const fichier = (nom, contenu) => ({ name: nom, mimeType: 'text/csv', buffer: Bu
 // ------------------------------------------------------------ Accueil public
 const page = await nouvellePage(1360, 900);
 await page.goto(BASE);
-await page.getByRole('heading', { name: /Trouvez votre médicament/ }).waitFor();
-verifier(true, 'accueil public : page d’attente du site patient');
+await page.getByRole('heading', { name: 'Aucune garde enregistrée pour aujourd’hui' }).waitFor();
+verifier(true, 'site patient sans données : message clair, pas d’erreur');
 
 // ------------------------------------------------------------ Compte non admin
 await seConnecter(page, 'patient@exemple.ga');

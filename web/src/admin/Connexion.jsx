@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase, messageErreur } from '../lib/supabase.js';
-import { Croix } from '../Accueil.jsx';
+import { Croix } from '../Croix.jsx';
 
 // Connexion sans mot de passe (cahier des charges, section 10) : un e-mail
 // contenant un lien de connexion, et un code si le modèle d'e-mail l'affiche.

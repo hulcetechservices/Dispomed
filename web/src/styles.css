@@ -210,7 +210,7 @@ button[aria-pressed="true"] { background: var(--vert-clair); }
 .jour-col > header { padding: .45rem .6rem; border-bottom: 1px solid var(--trait); font-weight: 600; font-size: .85rem; display: flex; justify-content: space-between; align-items: center; gap: .3rem; }
 .jour-col.aujourdhui > header { background: var(--vert); color: #fff; }
 .jour-col .liste { padding: .4rem; display: grid; gap: .35rem; align-content: start; }
-.garde {
+.jour-col .garde {
   border-radius: 6px;
   padding: .35rem .5rem;
   background: var(--vert-clair);
@@ -219,10 +219,10 @@ button[aria-pressed="true"] { background: var(--vert-clair); }
   display: grid;
   gap: .05rem;
 }
-.garde.nuit { background: var(--nuit-clair); border-left-color: var(--nuit); }
-.garde .qui { font-weight: 600; }
-.garde .quand { color: var(--encre-douce); }
-.garde button { justify-self: start; }
+.jour-col .garde.nuit { background: var(--nuit-clair); border-left-color: var(--nuit); }
+.jour-col .garde .qui { font-weight: 600; }
+.jour-col .garde .quand { color: var(--encre-douce); }
+.jour-col .garde button { justify-self: start; }
 .vide-jour { color: var(--attente); font-size: .8rem; padding: .25rem; }
 @media (max-width: 900px) {
   .semaine { grid-template-columns: 1fr; }
@@ -255,9 +255,3 @@ button[aria-pressed="true"] { background: var(--vert-clair); }
   max-width: calc(100% - 2rem);
 }
 .notification.erreur { background: var(--suspendu); }
-
-/* ---------- Accueil patient (lot 2) ---------- */
-
-.accueil { max-width: 40rem; margin: 0 auto; padding: 3rem 1.25rem; display: grid; gap: 1.25rem; }
-.accueil h1 { font-size: 1.8rem; line-height: 1.2; }
-.accueil ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .4rem; }

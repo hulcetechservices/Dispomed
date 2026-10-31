@@ -8,7 +8,7 @@ n'est nécessaire.
 
 Référence : *Cahier des charges — Plateforme Pharmacies Gabon* (31 octobre 2026).
 
-En ligne : **https://dispomed-tan.vercel.app** (back-office : `/admin`).
+En ligne : **https://dispomed-tan.vercel.app** (site patient) et `/admin` (back-office).
 
 ## Avancement par lot
 
@@ -16,7 +16,7 @@ En ligne : **https://dispomed-tan.vercel.app** (back-office : `/admin`).
 | --- | --- | --- |
 | 0 | Schéma Supabase (section 8), règles d'accès, déploiement | Fait |
 | 1 | Back-office : pharmacies, horaires, gardes, base médicaments (ADM-01 à 03) | Fait |
-| 2 | Site patient : carte, fiches, gardes, filtre CNAMGS, PWA | À faire |
+| 2 | Site patient : carte, fiches, gardes, filtre CNAMGS, PWA | Fait |
 | 3 | Demande de disponibilité, réponses en direct, clôture à 15 min | À faire |
 | 4 | WhatsApp : notifications pharmacie, bot patient | À faire |
 | 5 | Tableau de bord pharmacie : OTP, employés, statistiques | À faire |
@@ -24,6 +24,23 @@ En ligne : **https://dispomed-tan.vercel.app** (back-office : `/admin`).
 
 L'ancien prototype « gestion de stock » est archivé dans la branche
 `archive/espace-officine-stock` (l'import de stock est prévu en version 2).
+
+## Site patient (lot 2)
+
+- **Pharmacies de garde en ce moment** par défaut, ou toutes les pharmacies, avec l'état
+  calculé à l'heure de Libreville : « De garde jusqu'à 8 h », « Ouverte jusqu'à 20 h »,
+  « Fermée, ouvre demain à 8 h ». Une pharmacie de garde est ouverte pendant toute sa garde,
+  même hors horaires (RG-07).
+- **Position** : GPS, ou quartier choisi dans une liste (sans GPS). Tri : ouvertes d'abord,
+  puis les plus proches.
+- **Filtre CNAMGS**, sur la liste et sur les gardes.
+- **Fiche pharmacie** : appel et itinéraire en un clic, adresse et carte, horaires de la
+  semaine, gardes à venir, assurances et services.
+- **Carte** OpenStreetMap (gardes en bleu nuit, ouvertes en vert).
+- **Nuit** (20 h–7 h) : affichage sombre, moins éblouissant.
+- **Hors ligne** : dernière liste gardée sur le téléphone, affichée avec sa date ; site
+  installable (PWA). Page patient : environ 340 Ko, le back-office est chargé à part.
+- Testé en 3G simulée : la garde la plus proche s'affiche en 7 secondes (critère : 30 s).
 
 ## Back-office (lot 1)
 
@@ -88,7 +105,7 @@ La personne se connecte ensuite sur `/admin` avec cette adresse.
 ```bash
 bash supabase/tests/run.sh          # règles d'accès et fonctions (Postgres 15+)
 cd web && npm test                  # lecture des fichiers, dates et heures
-npm run e2e                         # back-office complet dans Chrome (faux Supabase)
+npm run e2e                         # back-office et site patient dans Chrome (faux Supabase, 3G simulée)
 ```
 
 ## Questions ouvertes (cahier des charges, section 13)

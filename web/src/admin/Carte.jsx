@@ -1,25 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-
-// Carte OpenStreetMap (Leaflet, chargé à la demande) pour placer une pharmacie.
-const LEAFLET = 'https://unpkg.com/leaflet@1.9.4/dist/';
-const LIBREVILLE = [0.4162, 9.4673];
-let chargement;
-
-function chargerLeaflet() {
-  if (window.L) return Promise.resolve(window.L);
-  chargement ??= new Promise((ok, ko) => {
-    const css = document.createElement('link');
-    css.rel = 'stylesheet';
-    css.href = `${LEAFLET}leaflet.css`;
-    document.head.append(css);
-    const js = document.createElement('script');
-    js.src = `${LEAFLET}leaflet.js`;
-    js.onload = () => ok(window.L);
-    js.onerror = () => { chargement = null; ko(new Error('Carte indisponible')); };
-    document.head.append(js);
-  });
-  return chargement;
-}
+// Carte OpenStreetMap pour placer une pharmacie.
+import { chargerLeaflet, fondDeCarte, LIBREVILLE } from '../lib/leaflet.js';
 
 export default function Carte({ latitude, longitude, onChoisir }) {
   const boite = useRef();
@@ -33,10 +14,7 @@ export default function Carte({ latitude, longitude, onChoisir }) {
       if (detruit || carte.current) return;
       const position = latitude != null && longitude != null ? [latitude, longitude] : LIBREVILLE;
       carte.current = L.map(boite.current).setView(position, latitude != null ? 16 : 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© contributeurs OpenStreetMap',
-      }).addTo(carte.current);
+      fondDeCarte(L).addTo(carte.current);
       if (latitude != null) repere.current = L.marker(position).addTo(carte.current);
       carte.current.on('click', (e) => {
         const { lat, lng } = e.latlng;

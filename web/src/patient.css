@@ -1,0 +1,112 @@
+/* Site patient. Téléphone d'abord, lisible de nuit : après 20 h la page passe en
+   couleurs sombres (data-moment="nuit"), moins éblouissantes quand on cherche une garde. */
+
+.patient {
+  --p-fond: #f6f7f5;
+  --p-surface: #ffffff;
+  --p-encre: #16201f;
+  --p-doux: #556563;
+  --p-trait: #d9e0de;
+  --p-accent: #0b4f4a;
+  --p-garde: #263a85;
+  --p-garde-fond: #e8ecfa;
+  --p-ouverte: #1f7a45;
+  --p-fermee: #6b7675;
+  min-height: 100vh;
+  background: var(--p-fond);
+  color: var(--p-encre);
+  display: flex;
+  flex-direction: column;
+}
+:root[data-moment="nuit"] { color-scheme: dark; }
+:root[data-moment="nuit"] body { background: #0d1530; }
+:root[data-moment="nuit"] .patient {
+  --p-fond: #0d1530;
+  --p-surface: #16204a;
+  --p-encre: #eef1fb;
+  --p-doux: #aab3d6;
+  --p-trait: #2b3768;
+  --p-accent: #7fd6c9;
+  --p-garde: #a9b8ff;
+  --p-garde-fond: #1f2b63;
+  --p-ouverte: #7fd6a2;
+  --p-fermee: #8d96b8;
+}
+
+.barre-patient { padding: .8rem 1rem; display: flex; align-items: center; }
+.barre-patient .marque { color: var(--p-encre); text-decoration: none; }
+.contenu-patient { width: 100%; max-width: 44rem; margin: 0 auto; padding: .5rem 1rem 2rem; display: grid; gap: 1rem; flex: 1; align-content: start; }
+.pied-patient { max-width: 44rem; margin: 0 auto; padding: 1rem; color: var(--p-doux); font-size: .825rem; }
+
+.patient button, .patient .bouton { background: var(--p-accent); border-color: var(--p-accent); color: var(--p-fond); min-height: 46px; justify-content: center; }
+.patient button.secondaire, .patient .bouton.secondaire { background: transparent; color: var(--p-accent); }
+.patient button.discret-btn { background: transparent; border-color: transparent; color: var(--p-accent); min-height: 36px; padding-left: 0; }
+.patient select, .patient input { background: var(--p-surface); color: var(--p-encre); border-color: var(--p-trait); min-height: 46px; }
+.patient .discret { color: var(--p-doux); }
+.patient .erreur { color: #e5484d; }
+
+/* Le titre-réponse : la chose à lire en premier. */
+.tete { display: grid; gap: .35rem; padding-top: .5rem; }
+.tete .heure { color: var(--p-doux); font-size: .95rem; }
+.tete h1 { font-size: clamp(1.6rem, 6vw, 2.3rem); line-height: 1.12; letter-spacing: -.01em; font-weight: 750; max-width: 22ch; }
+
+.reglages { display: grid; gap: .6rem; }
+.position { display: grid; grid-template-columns: auto 1fr; gap: .5rem; }
+.filtres-patient { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; }
+.patient label.case { min-height: 46px; }
+
+.bascule { display: inline-flex; border: 1px solid var(--p-trait); border-radius: 10px; padding: 3px; background: var(--p-surface); }
+.patient .bascule button { background: transparent; color: var(--p-doux); border: none; min-height: 40px; border-radius: 7px; padding: .3rem 1rem; }
+.patient .bascule button[aria-pressed="true"] { background: var(--p-accent); color: var(--p-fond); }
+.bascule.vues { justify-self: start; }
+
+.cartes-pharmacies { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
+.carte-pharmacie {
+  background: var(--p-surface);
+  border: 1px solid var(--p-trait);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+  display: grid;
+  gap: .3rem;
+}
+.carte-pharmacie.garde { border-color: var(--p-garde); box-shadow: inset 4px 0 0 var(--p-garde); }
+.titre-pharmacie { color: var(--p-encre); font-weight: 700; font-size: 1.1rem; text-decoration: none; }
+.titre-pharmacie:hover { text-decoration: underline; }
+.etat-ligne { display: flex; flex-wrap: wrap; gap: .3rem .9rem; align-items: baseline; }
+.etat { font-weight: 650; }
+.etat.garde { color: var(--p-garde); }
+.etat.ouverte { color: var(--p-ouverte); }
+.etat.fermee { color: var(--p-fermee); }
+.distance { color: var(--p-doux); font-variant-numeric: tabular-nums; }
+.lieu { color: var(--p-doux); display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+.pastille-cnamgs { font-size: .75rem; font-weight: 700; border: 1px solid currentColor; border-radius: 99px; padding: 0 .5rem; color: var(--p-accent); }
+.actions-pharmacie { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .35rem; }
+.actions-pharmacie.grandes .bouton { min-height: 52px; font-size: 1.02rem; }
+
+.vide-patient { background: var(--p-surface); border: 1px dashed var(--p-trait); border-radius: 12px; padding: 1.1rem; display: grid; gap: .8rem; justify-items: start; }
+
+.bandeau-hors-ligne { background: #8a5a00; color: #fff; padding: .55rem 1rem; font-size: .9rem; max-width: none; }
+
+.carte-patient { height: 60vh; min-height: 18rem; }
+.carte-fiche { height: 13rem; margin-top: .4rem; }
+.legende { display: flex; flex-wrap: wrap; gap: .3rem .5rem; align-items: center; }
+.point { width: .7rem; height: .7rem; border-radius: 50%; display: inline-block; margin-left: .4rem; }
+.point.garde { background: #263a85; }
+.point.ouverte { background: #1f7a45; }
+.point.fermee { background: #7a8584; }
+
+.fiche .retour { justify-self: start; }
+.bloc { background: var(--p-surface); border: 1px solid var(--p-trait); border-radius: 12px; padding: 1rem; display: grid; gap: .45rem; }
+.bloc h2 { font-size: 1rem; }
+.liste-simple { margin: 0; padding-left: 1.1rem; display: grid; gap: .25rem; }
+.horaires-patient { border-collapse: collapse; width: 100%; }
+.horaires-patient th { text-align: left; font-weight: 500; padding: .3rem .8rem .3rem 0; width: 7rem; }
+.horaires-patient td { padding: .3rem 0; }
+.horaires-patient tr.aujourdhui { font-weight: 700; }
+.horaires-patient tr.aujourdhui th::after { content: " ●"; color: var(--p-accent); font-size: .7rem; vertical-align: middle; }
+
+.leaflet-container { font: inherit; }
+
+@media (max-width: 380px) {
+  .position { grid-template-columns: 1fr; }
+}

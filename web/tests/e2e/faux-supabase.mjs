@@ -24,6 +24,13 @@ const db = {
 };
 globalThis.__fauxDb = db;
 
+// Données d'essai injectées par un test (window.__fauxDonnees), et options :
+// __fauxHorsLigne (Supabase injoignable), __fauxDelai (millisecondes par requête, réseau lent).
+if (globalThis.__fauxDonnees) {
+  for (const [table, lignes] of Object.entries(globalThis.__fauxDonnees)) db[table] = lignes.map((l) => ({ ...l }));
+}
+const attendre = () => new Promise((ok) => setTimeout(ok, globalThis.__fauxDelai ?? 0));
+
 const recherche = (m) => norm(`${m.nom_commercial} ${m.molecule ?? ''} ${m.dosage ?? ''} ${m.forme ?? ''} ${m.synonymes.join(' ')}`);
 const journaliser = (action, cible, details) => db.journal.push({ id: db.journal.length + 1, action, cible, details, date: new Date().toISOString() });
 
@@ -96,7 +103,11 @@ function requete(table) {
     delete() { op = 'delete'; return q; },
     single() { unique = true; return q; },
     maybeSingle() { unique = true; return q; },
-    then(ok, ko) { return Promise.resolve().then(executer).then(ok, ko); },
+    then(ok, ko) {
+      return attendre()
+        .then(() => (globalThis.__fauxHorsLigne ? { data: null, error: { message: 'Failed to fetch' } } : executer()))
+        .then(ok, ko);
+    },
   };
   return q;
 }
