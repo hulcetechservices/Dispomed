@@ -192,5 +192,12 @@ exception when insufficient_privilege then
   raise notice 'ok  le public ne peut pas importer';
 end $$;
 
+do $$ begin
+  perform 1 from public.mon_stock;
+  raise exception 'ÉCHEC : le public lit mon_stock';
+exception when insufficient_privilege then
+  raise notice 'ok  le public ne lit pas mon_stock';
+end $$;
+
 reset role;
 \echo 'TOUS LES TESTS SONT PASSÉS'

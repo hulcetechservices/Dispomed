@@ -59,8 +59,11 @@ ou collez `supabase/migrations/20261031000001_semaine1_officines_stock.sql` dans
 
 ### 2. Application
 
-Dans `app/config.js`, renseignez l'URL du projet et la clé **publishable** (anon).
-Jamais la clé `service_role`.
+`app/config.js` pointe vers le projet Supabase « dispomed » (région Paris), avec la clé
+publique anon. Jamais la clé `service_role`.
+
+Déploiement : projet Vercel « dispomed », dossier racine `app`, sans commande de build.
+`app/vercel.json` ajoute les en-têtes de sécurité (scripts limités au site, au CDN et à Supabase).
 
 Dans Supabase > Authentication > URL Configuration, ajoutez l'adresse du site
 (pour le lien « mot de passe oublié »).

@@ -94,7 +94,7 @@ as $$
     and o.active
 $$;
 
-revoke all on function public.mon_officine() from public;
+revoke all on function public.mon_officine() from public, anon;
 grant execute on function public.mon_officine() to authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -235,7 +235,7 @@ begin
 end
 $$;
 
-revoke all on function public.confirmer_stock(uuid[]) from public;
+revoke all on function public.confirmer_stock(uuid[]) from public, anon;
 grant execute on function public.confirmer_stock(uuid[]) to authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -257,6 +257,7 @@ select
 from public.stocks s
 join public.produits p on p.id = s.produit_id;
 
+revoke all on public.mon_stock from anon;
 grant select on public.mon_stock to authenticated;
 
 -- Liste de réapprovisionnement : produits au seuil ou en dessous.
@@ -267,6 +268,7 @@ select produit_id, code, nom, quantite, seuil_alerte,
 from public.mon_stock
 where en_alerte;
 
+revoke all on public.a_reapprovisionner from anon;
 grant select on public.a_reapprovisionner to authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -301,6 +303,7 @@ join public.produits  p on p.id = s.produit_id
 where o.active
   and s.quantite > 0;
 
+revoke all on public.disponibilites from anon, authenticated;
 grant select on public.disponibilites to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -473,5 +476,5 @@ begin
 end
 $$;
 
-revoke all on function public.importer_stock(jsonb, text, boolean, text) from public;
+revoke all on function public.importer_stock(jsonb, text, boolean, text) from public, anon;
 grant execute on function public.importer_stock(jsonb, text, boolean, text) to authenticated;
