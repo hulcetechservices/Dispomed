@@ -140,6 +140,17 @@ const deborde = await mobile.evaluate(() => document.documentElement.scrollWidth
 verifier(!deborde, 'téléphone : pas de défilement horizontal');
 await mobile.screenshot({ path: path.join(SORTIE, '6-stock-mobile.png'), fullPage: true });
 
+// ------------------------------------------------------------ Invitation
+const invite = await nouvellePage(390, 844);
+await invite.goto(BASE + '#access_token=x&refresh_token=y&type=invite');
+await invite.getByText('Bienvenue sur Dispomed').waitFor();
+await invite.getByLabel('Nouveau mot de passe').fill('court');
+verifier(!(await invite.locator('#form-mdp').evaluate((f) => f.checkValidity())), 'invitation : mot de passe trop court refusé');
+await invite.getByLabel('Nouveau mot de passe').fill('un-mot-de-passe-solide');
+await invite.getByRole('button', { name: 'Enregistrer le mot de passe' }).click();
+await invite.getByRole('heading', { name: 'Stock' }).waitFor();
+verifier(true, 'invitation : mot de passe choisi, puis arrivée sur son officine');
+
 verifier(erreurs.length === 0, `aucune erreur JavaScript${erreurs.length ? ' : ' + erreurs.join(' | ') : ''}`);
 await navigateur.close();
 await writeFile(path.join(SORTIE, 'resultat.txt'), echecs ? `${echecs} échec(s)` : 'ok');

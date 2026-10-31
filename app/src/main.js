@@ -21,6 +21,11 @@ const ONGLETS = [
 
 const contexte = { pharmacien: null, officine: null };
 
+// Lien d'invitation Supabase : le compte est créé par l'équipe Dispomed, le
+// pharmacien choisit son mot de passe à la première ouverture. À lire avant
+// que supabase-js ne consomme l'adresse.
+let invitation = /(^|[#&])type=invite(&|$)/.test(location.hash);
+
 // ---------------------------------------------------------------- Connexion
 
 function afficherConnexion(message = '') {
@@ -72,11 +77,12 @@ function afficherConnexion(message = '') {
   });
 }
 
-function afficherNouveauMotDePasse() {
+function afficherNouveauMotDePasse({ bienvenue = false } = {}) {
   racine.innerHTML = html`
     <div class="connexion">
       <form id="form-mdp">
-        <div class="marque">${LOGO} Nouveau mot de passe</div>
+        <div class="marque">${LOGO} ${bienvenue ? 'Bienvenue sur Dispomed' : 'Nouveau mot de passe'}</div>
+        ${bienvenue ? brut('<p class="discret">Choisissez le mot de passe de votre compte. Vous l\'utiliserez pour vous connecter avec votre adresse e-mail.</p>') : ''}
         <label class="champ">Nouveau mot de passe
           <span class="aide">10 caractères minimum.</span>
           <input type="password" name="mdp" minlength="10" autocomplete="new-password" required>
@@ -190,12 +196,17 @@ if (!configure) {
     <p>Renseignez l'URL du projet Supabase et la clé publishable dans <b>config.js</b>.</p>
   </form></div>`;
 } else {
-  supabase.auth.onAuthStateChange((evenement) => {
+  supabase.auth.onAuthStateChange((evenement, session) => {
     if (evenement === 'PASSWORD_RECOVERY') { afficherNouveauMotDePasse(); return; }
     if (evenement === 'SIGNED_OUT') {
       sessionChargee = null;
       Object.assign(contexte, { pharmacien: null, officine: null });
       afficherConnexion();
+      return;
+    }
+    if (invitation && session && (evenement === 'SIGNED_IN' || evenement === 'INITIAL_SESSION')) {
+      invitation = false;
+      afficherNouveauMotDePasse({ bienvenue: true });
       return;
     }
     if (evenement === 'SIGNED_IN' || evenement === 'INITIAL_SESSION') {

@@ -114,7 +114,8 @@ function importer({ lignes, mode, simulation, fichier }) {
 }
 
 export function createClient() {
-  let session = null;
+  let session = /access_token=/.test(location.hash) ? { user: { id: 'u1', email: 'invite@pharmacie.ga' } } : null;
+  let motDePasse = null;
   const abonnes = [];
   const emettre = (e) => abonnes.forEach((f) => f(e, session));
   return {
@@ -129,7 +130,8 @@ export function createClient() {
       },
       async signOut() { session = null; emettre('SIGNED_OUT'); return { error: null }; },
       async resetPasswordForEmail() { return { error: null }; },
-      async updateUser() { return { error: null }; },
+      async updateUser({ password }) { motDePasse = password; return { error: null }; },
+      _motDePasse: () => motDePasse,
     },
     from: requete,
     async rpc(nom, args) {
