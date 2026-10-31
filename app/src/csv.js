@@ -5,7 +5,7 @@
 export function normaliserEntete(texte) {
   return String(texte ?? '')
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[_\-.]+/g, ' ')
     .replace(/\s+/g, ' ')
@@ -37,7 +37,7 @@ export function correspondreColonnes(entetes) {
 
 /** Devine le séparateur (Excel en français exporte souvent avec « ; »). */
 export function detecterSeparateur(texte) {
-  const premiere = texte.replace(/^﻿/, '').split(/\r?\n/, 1)[0] ?? '';
+  const premiere = texte.replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0] ?? '';
   let meilleur = ',';
   let max = -1;
   for (const sep of [';', ',', '\t']) {
@@ -54,7 +54,7 @@ export function detecterSeparateur(texte) {
 
 /** Découpe un texte CSV en lignes de cellules (guillemets et "" gérés). */
 export function analyserCsv(texte, separateur = detecterSeparateur(texte)) {
-  const source = texte.replace(/^﻿/, '');
+  const source = texte.replace(/^\uFEFF/, '');
   const lignes = [];
   let ligne = [];
   let cellule = '';

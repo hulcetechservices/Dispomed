@@ -21,7 +21,7 @@ export function mettreAJourCompteur(n) {
 
 /** Télécharge un texte comme fichier. */
 export function telecharger(nomFichier, contenu, type = 'text/csv;charset=utf-8') {
-  const url = URL.createObjectURL(new Blob(['﻿' + contenu], { type }));
+  const url = URL.createObjectURL(new Blob(['\uFEFF' + contenu], { type }));
   const a = document.createElement('a');
   a.href = url;
   a.download = nomFichier;
