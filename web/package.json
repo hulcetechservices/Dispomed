@@ -1,0 +1,22 @@
+{
+  "name": "dispomed-web",
+  "private": true,
+  "type": "module",
+  "description": "Plateforme Pharmacies Gabon : site patient, tableau de bord pharmacie, back-office.",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "e2e": "node build.mjs --faux && node tests/e2e/back-office.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

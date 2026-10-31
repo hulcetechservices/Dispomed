@@ -1,141 +1,98 @@
-# Dispomed
+# Plateforme Pharmacies Gabon
 
-Trouver le bon médicament dans la bonne pharmacie, avant de se déplacer.
-Ce dépôt contient la **semaine 1** de la spécification v0.1 : l'espace officine.
+Un patient du Grand Libreville trouve un médicament **sans faire le tour des pharmacies** :
+il envoie une demande de disponibilité aux pharmacies proches, qui répondent Oui, Non ou
+Alternative, et il voit les réponses en direct. La plateforme affiche aussi les pharmacies
+de garde et celles qui acceptent la CNAMGS. Aucune connexion au stock des pharmacies
+n'est nécessaire.
 
-| Fait | Pas encore |
-| --- | --- |
-| Comptes pharmaciens rattachés à une officine, vérifiés à la main | Comptes patients, vérification des pièces (semaine 2) |
-| Stock, seuils d'alerte, liste « à commander » | Réservations, non-retraits, pénalités (semaines 2-3) |
-| Import CSV / Excel avec aperçu et lignes en erreur | Dépôt automatique, connexion au logiciel (après le pilote) |
-| Règle de fraîcheur 12 h / 48 h | Connexion par code SMS |
-| Monnaies et moyens de paiement de l'officine | Application patient |
-| Vue publique `disponibilites` limitée aux champs prévus | |
+Référence : *Cahier des charges — Plateforme Pharmacies Gabon* (31 octobre 2026).
 
-## Ce qui protège les données
+En ligne : **https://dispomed-tan.vercel.app** (back-office : `/admin`).
 
-La règle « un pharmacien ne voit et ne modifie que son officine » est appliquée **dans la base**,
-pas dans l'interface (spec §3 et §9) :
+## Avancement par lot
 
-- Row Level Security sur chaque table. L'officine est déduite du compte connecté
-  (`mon_officine()`), jamais lue dans la requête du client.
-- Droits par colonne : un pharmacien ne peut ni changer d'officine, ni se déclarer vérifié,
-  ni renommer son officine, ni écrire lui-même la date de confirmation du stock.
-- Le public (clé anon) ne lit aucune table. Il ne voit que la vue `disponibilites` :
-  officine, produit, prix, monnaies, paiements, fraîcheur. Ni quantité exacte, ni seuil,
-  ni donnée de compte.
-- Un compte non vérifié ne voit rien et ne peut rien importer.
+| Lot | Contenu | État |
+| --- | --- | --- |
+| 0 | Schéma Supabase (section 8), règles d'accès, déploiement | Fait |
+| 1 | Back-office : pharmacies, horaires, gardes, base médicaments (ADM-01 à 03) | Fait |
+| 2 | Site patient : carte, fiches, gardes, filtre CNAMGS, PWA | À faire |
+| 3 | Demande de disponibilité, réponses en direct, clôture à 15 min | À faire |
+| 4 | WhatsApp : notifications pharmacie, bot patient | À faire |
+| 5 | Tableau de bord pharmacie : OTP, employés, statistiques | À faire |
+| 6 | Abonnements Mobile Money, réservations | À faire |
 
-`supabase/tests/isolation.sql` vérifie ces règles (30 contrôles).
+L'ancien prototype « gestion de stock » est archivé dans la branche
+`archive/espace-officine-stock` (l'import de stock est prévu en version 2).
+
+## Back-office (lot 1)
+
+- **Connexion sans mot de passe** : lien (et code) envoyé par e-mail. Seuls les e-mails de
+  la table `admins_autorises` reçoivent le rôle admin ; tout autre compte voit « Accès réservé ».
+- **Pharmacies** : liste filtrable, fiche complète (position sur carte OpenStreetMap,
+  horaires à plusieurs plages, CNAMGS, mutuelles, services), validation, suspension,
+  réactivation, import Excel/CSV avec aperçu.
+- **Gardes** : semaine par commune, ajout en deux clics (préréglages nuit 20 h → 8 h, 24 h),
+  import du calendrier Excel/CSV. Noms de pharmacie abrégés reconnus s'ils sont sans
+  ambiguïté ; heures à l'heure de Libreville.
+- **Médicaments** : recherche (accents ignorés, synonymes), ajout, modification,
+  fusion des doublons, import.
+- **Journal** : validations, suspensions, imports, fusions, suppressions.
+
+Modèles d'import : `web/public/modeles/` (pharmacies, gardes, médicaments).
+
+## Sécurité des données
+
+Règles appliquées dans la base (RLS), testées par `supabase/tests/acces.sql` (54 contrôles) :
+
+- le public voit les fiches des pharmacies **actives** (sans numéro d'autorisation ni
+  titulaire), leurs horaires, les gardes **validées** et la base médicaments ;
+- une pharmacie ne voit que les sollicitations qui la visent, jamais les demandes des
+  patients ni les autres pharmacies ;
+- toutes les fonctions d'administration vérifient le rôle admin côté serveur ;
+- personne ne peut modifier son propre rôle ; les actions sensibles sont journalisées.
 
 ## Structure
 
 ```
 supabase/
-  migrations/   schéma, RLS, fonctions importer_stock() et confirmer_stock()
-  tests/        tests d'isolation sur un Postgres local jetable
-app/            espace officine, HTML + modules JS, sans étape de build
-  config.js     URL Supabase et clé publishable à renseigner
-  src/csv.js    lecture des fichiers de stock (testée)
-  src/vues/     stock, importer, à commander, mon officine
-  tests/        tests unitaires + parcours complet dans Chrome
+  migrations/   schéma, règles d'accès, fonctions, données de départ
+  tests/        tests SQL sur un Postgres local jetable (bash supabase/tests/run.sh)
+web/            application React (site patient, back-office), compilée par esbuild
+  src/admin/    back-office
+  src/lib/      Supabase, lecture des fichiers, dates à l'heure de Libreville
+  tests/        tests unitaires et parcours complet dans Chrome
 ```
 
-L'application n'a pas d'étape de build : supabase-js et SheetJS (Excel) sont chargés depuis
-un CDN. On peut la servir telle quelle (Vercel, Netlify, n'importe quel hébergement statique).
+## Déploiement
 
-## Mise en route
+- **Base** : projet Supabase « dispomed » (Paris). Les migrations de `supabase/migrations`
+  y sont appliquées dans l'ordre.
+- **Site** : projet Vercel « dispomed », relié au dépôt GitHub. Chaque push sur `main`
+  compile `web/` (`npm run build`) et publie `web/dist`. En-têtes de sécurité dans
+  `web/vercel.json`.
+- **Supabase Auth** : *Site URL* = `https://dispomed-tan.vercel.app`, et
+  `https://dispomed-tan.vercel.app/**` dans les *Redirect URLs*, pour que le lien de
+  connexion ramène au back-office.
 
-### 1. Base de données
-
-Créez un projet Supabase (région la plus proche : `eu-west`), puis appliquez la migration :
-
-```bash
-supabase link --project-ref VOTRE_REF
-supabase db push
-```
-
-ou collez `supabase/migrations/20261031000001_semaine1_officines_stock.sql` dans l'éditeur SQL.
-
-### 2. Application
-
-`app/config.js` pointe vers le projet Supabase « dispomed » (région Paris), avec la clé
-publique anon. Jamais la clé `service_role`.
-
-**En ligne : https://dispomed-tan.vercel.app** (projet Vercel « dispomed »).
-
-Déploiement : le contenu du dossier `app` est publié tel quel, sans commande de build.
-`app/vercel.json` ajoute les en-têtes de sécurité (scripts limités au site, au CDN et à Supabase).
-La protection Vercel reste active sur les prévisualisations ; l'adresse de production est publique,
-l'accès aux données étant protégé par la connexion et les règles de la base.
-
-Pour que chaque `git push` redéploie automatiquement, installez l'application GitHub de Vercel
-sur le dépôt (Vercel > projet dispomed > Settings > Git), avec `app` comme dossier racine.
-
-Dans Supabase > Authentication > URL Configuration, mettez `https://dispomed-tan.vercel.app`
-en *Site URL* et dans les *Redirect URLs* : les liens d'invitation et de réinitialisation
-y renvoient.
-
-Pour tester en local :
-
-```bash
-cd app && npx serve .
-```
-
-### 3. Créer un compte pharmacien (équipe Dispomed)
-
-1. Vérifiez le numéro d'inscription à l'Ordre.
-2. Supabase > Authentication > Users > *Invite user* : saisissez l'e-mail du pharmacien.
-   Il reçoit un lien, arrive sur l'écran « Bienvenue » et choisit lui-même son mot de passe.
-3. Dans l'éditeur SQL :
+## Ajouter un administrateur
 
 ```sql
--- Une fois par officine
-insert into public.officines (nom, adresse, quartier, telephone, monnaies, moyens_paiement)
-values ('Pharmacie …', 'Adresse', 'Quartier', '+241 …', array['XAF'], array['especes','airtel_money'])
-returning id;
-
--- Rattacher le compte, déjà vérifié
-insert into public.pharmaciens (user_id, officine_id, nom, numero_ordre, verifie)
-select id, 'ID_OFFICINE', 'Dr …', 'N° ORDRE', true
-from auth.users where email = 'pharmacien@exemple.ga';
+insert into public.admins_autorises (email) values ('prenom.nom@exemple.ga');
 ```
 
-Le pharmacien ouvre le lien d'invitation, choisit son mot de passe, puis importe son stock.
-
-## Import du stock
-
-Colonnes reconnues (accents et casse indifférents) :
-
-| Champ | Intitulés acceptés | Obligatoire |
-| --- | --- | --- |
-| Code produit | code, code produit, CIP, EAN, référence… | oui |
-| Nom | nom, désignation, libellé, produit… | pour un produit nouveau |
-| Quantité | quantité, qté, stock… | oui |
-| Prix | prix, prix de vente, PV, PPV… | non |
-
-Séparateur `;`, `,` ou tabulation, détecté automatiquement. Encodage UTF-8 ou Windows-1252.
-Deux modes : mettre à jour les seuls produits du fichier, ou remplacer (les absents passent à 0,
-pour l'export complet du logiciel). L'aperçu est calculé par la base sans rien écrire.
-
-Un modèle est fourni : `app/modele-stock.csv`.
+La personne se connecte ensuite sur `/admin` avec cette adresse.
 
 ## Tests
 
 ```bash
-bash supabase/tests/run.sh            # isolation entre officines (Postgres 15+ local)
-cd app && npm test                    # lecture CSV, formats
-node tests/e2e/parcours.mjs           # parcours complet dans Chrome (Playwright)
+bash supabase/tests/run.sh          # règles d'accès et fonctions (Postgres 15+)
+cd web && npm test                  # lecture des fichiers, dates et heures
+npm run e2e                         # back-office complet dans Chrome (faux Supabase)
 ```
 
-Le parcours navigateur remplace Supabase par un faux client en mémoire
-(`app/tests/e2e/faux-supabase.mjs`) : il teste l'interface, pas les règles d'accès,
-qui sont testées par `isolation.sql`.
+## Questions ouvertes (cahier des charges, section 13)
 
-## Points ouverts
-
-- **Codes produits** (spec §4) : le référentiel `produits` se remplit avec les codes des fichiers.
-  Tant qu'aucun code commun n'est fixé avec les éditeurs, deux officines peuvent nommer
-  différemment le même médicament. À trancher avant d'ouvrir la recherche patient.
-- **Connexion par SMS** : prévue par la spec, elle demande un fournisseur SMS branché à Supabase Auth.
-- **Juridique** (spec §7) : rien dans ce lot ne stocke de pièce d'identité ni de donnée de santé.
+Nom commercial et domaine, source de la base médicaments (une base de départ de
+40 références courantes est chargée), fournisseur SMS pour l'OTP par téléphone,
+agrégateur Mobile Money, numéro WhatsApp Business, zone pilote.

@@ -5,3 +5,5 @@ node_modules/
 supabase/.temp/
 supabase/.branches/
 app/tests/e2e/captures/
+web/dist/
+web/tests/e2e/captures/

@@ -1,0 +1,263 @@
+/* Pharmacies Gabon — base commune et back-office.
+   Polices du système (pas de téléchargement : 3G et mode hors ligne). */
+
+:root {
+  --vert: #0b4f4a;
+  --vert-clair: #e3f0ee;
+  --encre: #16201f;
+  --encre-douce: #556563;
+  --fond: #f6f7f5;
+  --surface: #ffffff;
+  --trait: #d9e0de;
+  --survol: #eef3f2;
+  --actif: #1f7a45;
+  --attente: #a86400;
+  --suspendu: #b3261e;
+  --nuit: #263a85;
+  --nuit-clair: #e8ecfa;
+  --focus: #1b6fd1;
+  --rayon: 8px;
+  --police: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  font: 400 15px/1.5 var(--police);
+  font-variant-numeric: tabular-nums;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; line-height: 1.25; }
+h1 { font-size: 1.15rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--vert); }
+.chargement { padding: 2rem; color: var(--encre-douce); }
+.discret { color: var(--encre-douce); font-size: .9rem; }
+.erreur { color: var(--suspendu); font-weight: 600; }
+.pile { display: grid; gap: 1rem; }
+.ligne { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.ligne .pousse { margin-left: auto; }
+.visuellement-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Boutons et champs ---------- */
+
+button, .bouton {
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--rayon);
+  border: 1px solid var(--vert);
+  background: var(--vert);
+  color: #fff;
+  padding: .5rem .9rem;
+  min-height: 40px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  white-space: nowrap;
+}
+button.secondaire, .bouton.secondaire { background: var(--surface); color: var(--vert); }
+button.discret-btn { background: transparent; border-color: transparent; color: var(--vert); padding: .3rem .5rem; min-height: 32px; }
+button.danger { background: var(--surface); color: var(--suspendu); border-color: var(--suspendu); }
+button.petit { min-height: 32px; padding: .25rem .6rem; font-size: .875rem; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  padding: .45rem .6rem;
+  min-height: 40px;
+  min-width: 0;
+}
+input[type="checkbox"], input[type="radio"] { min-height: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--vert); }
+label.champ { display: grid; gap: .25rem; font-weight: 600; font-size: .9rem; }
+label.champ .aide { font-weight: 400; color: var(--encre-douce); }
+label.case { display: inline-flex; gap: .45rem; align-items: center; }
+.grille-champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .9rem; }
+
+/* ---------- Connexion ---------- */
+
+.ecran-centre { min-height: 100vh; display: grid; place-items: center; padding: 1rem; }
+.carte-connexion {
+  width: min(25rem, 100%);
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+.marque { display: flex; gap: .6rem; align-items: center; font-weight: 700; font-size: 1.1rem; }
+.marque svg { flex: none; }
+input.code { font-size: 1.5rem; letter-spacing: .35em; text-align: center; }
+
+/* ---------- Coque du back-office ---------- */
+
+.entete {
+  background: var(--vert);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .6rem 1rem;
+}
+.entete .marque { font-size: 1rem; }
+.entete .marque small { font-weight: 400; opacity: .8; }
+.entete .compte { margin-left: auto; display: flex; gap: .75rem; align-items: center; font-size: .875rem; }
+.entete button { background: transparent; border-color: rgba(255,255,255,.6); color: #fff; min-height: 34px; }
+@media (max-width: 640px) { .entete .compte span { display: none; } }
+
+nav.onglets {
+  display: flex;
+  gap: .15rem;
+  padding: 0 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--trait);
+  overflow-x: auto;
+}
+nav.onglets a {
+  padding: .75rem .85rem;
+  color: var(--encre-douce);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+nav.onglets a[aria-current="page"] { color: var(--vert); border-bottom-color: var(--vert); font-weight: 700; }
+nav.onglets .compteur { margin-left: .35rem; background: var(--attente); color: #fff; border-radius: 99px; padding: 0 .4rem; font-size: .75rem; font-weight: 700; }
+
+main.contenu { max-width: 78rem; margin: 0 auto; padding: 1.25rem 1rem 4rem; display: grid; gap: 1.1rem; }
+
+/* ---------- Tableaux ---------- */
+
+.tableau-boite { background: var(--surface); border: 1px solid var(--trait); border-radius: var(--rayon); overflow-x: auto; }
+table.tableau { width: 100%; border-collapse: collapse; font-size: .925rem; }
+.tableau th { text-align: left; font-weight: 600; color: var(--encre-douce); font-size: .8rem; padding: .55rem .75rem; border-bottom: 1px solid var(--trait); white-space: nowrap; }
+.tableau td { padding: .55rem .75rem; border-bottom: 1px solid var(--trait); vertical-align: middle; }
+.tableau tr:last-child td { border-bottom: none; }
+.tableau tbody tr:hover { background: var(--survol); }
+.tableau .nom { font-weight: 600; }
+.tableau .sous { color: var(--encre-douce); font-size: .825rem; }
+.tableau .actions { text-align: right; white-space: nowrap; }
+
+.statut { display: inline-flex; align-items: center; gap: .35rem; font-size: .825rem; font-weight: 600; white-space: nowrap; }
+.statut::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: currentColor; }
+.statut.active { color: var(--actif); }
+.statut.en_attente { color: var(--attente); }
+.statut.suspendue { color: var(--suspendu); }
+.manquant { color: var(--attente); font-size: .825rem; }
+
+.resume { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; color: var(--encre-douce); }
+.resume strong { color: var(--encre); font-size: 1.1rem; }
+
+/* ---------- Panneau latéral (fiche, import) ---------- */
+
+.voile { position: fixed; inset: 0; background: rgba(16, 26, 25, .35); z-index: 20; }
+.panneau {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(44rem, 100%);
+  background: var(--fond);
+  z-index: 21;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  box-shadow: -8px 0 32px rgba(16, 26, 25, .18);
+}
+.panneau > header, .panneau > footer {
+  background: var(--surface);
+  padding: .9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.panneau > header { border-bottom: 1px solid var(--trait); }
+.panneau > footer { border-top: 1px solid var(--trait); flex-wrap: wrap; }
+.panneau > footer .pousse { margin-left: auto; }
+button[aria-pressed="true"] { background: var(--vert-clair); }
+.panneau > header h2 { font-size: 1.15rem; }
+.panneau > header button { margin-left: auto; }
+.panneau .corps { overflow-y: auto; padding: 1.1rem; display: grid; gap: 1.25rem; align-content: start; }
+.section { background: var(--surface); border: 1px solid var(--trait); border-radius: var(--rayon); padding: 1rem; display: grid; gap: .85rem; }
+.section > h3 { font-size: .95rem; }
+
+/* ---------- Horaires ---------- */
+
+.horaires { display: grid; gap: .4rem; }
+.horaire-jour { display: grid; grid-template-columns: 6.5rem 1fr; gap: .5rem; align-items: start; }
+.horaire-jour .jour { font-weight: 600; padding-top: .45rem; text-transform: capitalize; }
+.horaire-plages { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.plage { display: inline-flex; gap: .25rem; align-items: center; }
+.plage input { width: 8.5rem; }
+@media (max-width: 520px) { .horaire-jour { grid-template-columns: 1fr; } }
+
+/* ---------- Carte ---------- */
+
+.carte { height: 18rem; border-radius: var(--rayon); border: 1px solid var(--trait); overflow: hidden; }
+
+/* ---------- Gardes : la semaine d'un coup d'œil ---------- */
+
+.semaine { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; }
+.jour-col { background: var(--surface); border: 1px solid var(--trait); border-radius: var(--rayon); min-height: 9rem; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+.jour-col > header { padding: .45rem .6rem; border-bottom: 1px solid var(--trait); font-weight: 600; font-size: .85rem; display: flex; justify-content: space-between; align-items: center; gap: .3rem; }
+.jour-col.aujourdhui > header { background: var(--vert); color: #fff; }
+.jour-col .liste { padding: .4rem; display: grid; gap: .35rem; align-content: start; }
+.garde {
+  border-radius: 6px;
+  padding: .35rem .5rem;
+  background: var(--vert-clair);
+  border-left: 4px solid var(--vert);
+  font-size: .825rem;
+  display: grid;
+  gap: .05rem;
+}
+.garde.nuit { background: var(--nuit-clair); border-left-color: var(--nuit); }
+.garde .qui { font-weight: 600; }
+.garde .quand { color: var(--encre-douce); }
+.garde button { justify-self: start; }
+.vide-jour { color: var(--attente); font-size: .8rem; padding: .25rem; }
+@media (max-width: 900px) {
+  .semaine { grid-template-columns: 1fr; }
+  .jour-col { min-height: 0; }
+}
+
+/* ---------- Import ---------- */
+
+.depot { border: 2px dashed var(--trait); border-radius: var(--rayon); padding: 1.25rem; display: grid; gap: .5rem; justify-items: start; background: var(--surface); }
+.depot.survol { border-color: var(--vert); background: var(--vert-clair); }
+.bilan { display: flex; flex-wrap: wrap; gap: .5rem 2rem; }
+.bilan div { display: grid; }
+.bilan strong { font-size: 1.5rem; }
+.bilan .ko strong { color: var(--suspendu); }
+.liste-erreurs { margin: 0; padding-left: 1.2rem; display: grid; gap: .2rem; max-height: 14rem; overflow: auto; font-size: .9rem; }
+
+/* ---------- Notification ---------- */
+
+.notification {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  background: var(--encre);
+  color: #fff;
+  padding: .7rem 1rem;
+  border-radius: var(--rayon);
+  font-weight: 600;
+  z-index: 40;
+  max-width: calc(100% - 2rem);
+}
+.notification.erreur { background: var(--suspendu); }
+
+/* ---------- Accueil patient (lot 2) ---------- */
+
+.accueil { max-width: 40rem; margin: 0 auto; padding: 3rem 1.25rem; display: grid; gap: 1.25rem; }
+.accueil h1 { font-size: 1.8rem; line-height: 1.2; }
+.accueil ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .4rem; }
